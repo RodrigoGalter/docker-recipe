@@ -35,19 +35,27 @@ services:
       - php
 
   mysql:
-    container_name: mysql-teste
+    container_name: mysql
     image: library/mysql:8.0.20
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=local_develop
+    volumes:
+      - data-mysql:/var/lib/mysql
 
-  adminer:
-    container_name: adminer
-    image: library/adminer:4.7.7
+  phpmyadmin:
+    container_name: phpmyadmin
+    image: phpmyadmin/phpmyadmin:fpm-alpine
     restart: always
+    environment:
+      - PMA_ARBITRARY=1
+      - MYSQL_USERNAME=root
+      - MYSQL_ROOT_PASSWORD=root
     ports:
-      - 9090:9090
-    depends_on:
-      - mysql
+      - 8181:80
     links:
       - mysql
+
+volumes:
+  data-mysql: {}
