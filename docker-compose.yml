@@ -1,4 +1,4 @@
-version: "3.2"
+version: "3.3"
 
 services:
 
@@ -13,23 +13,23 @@ services:
 
   nginx:
     container_name: nginx
-    image: library/nginx:1.18.0
+    image: library/nginx:1.19.0
     restart: always
     depends_on:
       - php
     ports:
-      - 8080:80
-      - 8443:443
+      - 80:80
+      - 443:443
     volumes:
       - ./:/var/www/html
       - ./docker/nginx/conf.d:/etc/nginx/conf.d
-      #- ./docker/nginx/ssl:/etc/nginx/ssl
+      - ./docker/nginx/ssl:/etc/nginx/ssl
     links:
       - php
 
   redis:
     container_name: redis
-    image: library/redis:6.0.1
+    image: library/redis:6.0.4
     restart: always
     links:
       - php
@@ -43,6 +43,8 @@ services:
       - MYSQL_DATABASE=local_develop
     volumes:
       - data-mysql:/var/lib/mysql
+    links: 
+      - php
 
   phpmyadmin:
     container_name: phpmyadmin
