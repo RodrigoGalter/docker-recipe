@@ -9,6 +9,9 @@ RUN apt-get update && \
     cron -y \
     vim
 
+# Extensions
+RUN docker-php-ext-install bcmath
+
 # Cron
 RUN echo "*/1 * * * * www-data /var/www/html/artisan schedule:run >> /var/www/html/storage/logs/api-schedule.log 2>&1" >> /etc/crontab
 
