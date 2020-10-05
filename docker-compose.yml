@@ -1,7 +1,7 @@
 version: "3.3"
 services:
 
-  ### PHP #################################################
+  ### PHP ##################################################
   php:
     container_name: php
     build:
@@ -15,7 +15,7 @@ services:
     volumes:
       - ./:/var/www/html
 
-  ### NGINX Server ########################################
+  ### NGINX Server #########################################
   nginx:
     container_name: nginx
     image: library/nginx:1.19.2
@@ -60,7 +60,7 @@ services:
     expose:
       - 3306
 
-  ### ElasticSearch #######################################
+  ### ElasticSearch ########################################
   elasticsearch:
     container_name: elasticsearch
     image: library/elasticsearch:7.6.1
@@ -78,6 +78,19 @@ services:
       - 9300:9300
     expose:
       - 9200
+
+  ### Kibana ###############################################
+  kibana:
+    container_name: kibana
+    image: elastic/kibana:7.6.1
+    volumes:
+      - ./docker/elasticHub/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+    ports:
+      - 5601:5601
+    tty: true
+    restart: unless-stopped
+    depends_on:
+      - elasticsearch
 
 volumes:
   data-mysql: { }
