@@ -1,2 +1,2 @@
-# docker-recipe
-Receita padrão para novos desenvolvimentos de projetos
+# Docker recipe
+Standard recipe for new projects.
