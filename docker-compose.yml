@@ -1,0 +1,85 @@
+version: "3.1"
+services:
+
+  ### PHP #################################################
+  php:
+    container_name: php
+    build:
+      context: ./docker/${APP_DOCKER_ENV:-dev}
+      args:
+        - NR_LICENSE_KEY=${NR_LICENSE_KEY}
+        - NR_APPLICATION_NAME=${NR_APPLICATION_NAME}
+    working_dir: /var/www/html/
+    tty: true
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www/html
+
+  ### NGINX Server ########################################
+  nginx:
+    container_name: nginx
+    image: library/nginx:1.19.2
+    tty: true
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www/html
+      - ./docker/${APP_DOCKER_ENV:-dev}/nginx/conf.d:/etc/nginx/conf.d
+      - ./docker/${APP_DOCKER_ENV:-dev}/nginx/ssl:/etc/nginx/ssl
+    ports:
+      - 80:80
+      - 443:443
+    links:
+      - php
+
+  ### Redis ################################################
+  redis:
+    container_name: redis
+    image: library/redis:6.0.8
+    restart: unless-stopped
+    tty: true
+    expose:
+      - 6379
+    ports:
+      - 6379:6379
+
+  ### MySQL ################################################
+  mysql:
+    container_name: mysql
+    image: mysql:8.0
+    environment:
+      - MYSQL_USER=root
+      - MYSQL_DATABASE=${DB_DATABASE:-default}
+      - MYSQL_PASSWORD=${DB_PASSWORD:-root}
+      - MYSQL_ROOT_PASSWORD=${DB_USERNAME:-root}
+    tty: true
+    restart: unless-stopped
+    volumes:
+      - data-mysql:/var/lib/mysql
+    ports:
+      - 3306:3306
+    expose:
+      - 3306
+
+  ### ElasticSearch #######################################
+  elasticsearch:
+    container_name: elasticsearch
+    image: library/elasticsearch:7.6.1
+    volumes:
+      - ./docker/elasticHub/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - data-elasticsearch:/usr/share/elasticsearch/data
+    tty: true
+    restart: unless-stopped
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - 9200:9200
+      - 9300:9300
+    expose:
+      - 9200
+
+
+volumes:
+  data-mysql: { }
+  data-elasticsearch: { }
